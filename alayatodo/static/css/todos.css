@@ -1,0 +1,15 @@
+button.mark:hover span {
+    visibility: visible;
+}
+
+button.mark span {
+    visibility: hidden;
+}
+
+button.mark.mark-completed span {
+    visibility: visible;
+}
+
+button.mark.mark-completed:hover span {
+    visibility: hidden;
+}

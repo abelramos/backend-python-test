@@ -3,6 +3,7 @@
 Usage:
   main.py [run]
   main.py initdb
+  main.py migrate
 """
 from docopt import docopt
 import subprocess
@@ -29,5 +30,9 @@ if __name__ == '__main__':
         _run_sql('resources/database.sql')
         _run_sql('resources/fixtures.sql')
         print "AlayaTodo: Database initialized."
+    elif args['migrate']:
+        for migration in os.listdir('resources/migrations'):
+            print 'Running migration "%s"' % migration
+            _run_sql(os.path.join('resources/migrations', migration))
     else:
         app.run(use_reloader=True)
