@@ -76,7 +76,7 @@ def todos():
     per_page = 3
     total = ToDo.objects.where(user_id=user_id).count()
     pagination = Pagination(page, per_page, total)
-    if page > pagination.pages:
+    if page > 1 and page > pagination.pages:
         return redirect('/todo/')
     offset = per_page*(page-1)
     todos = ToDo.objects.where(user_id=user_id)
