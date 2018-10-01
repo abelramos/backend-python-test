@@ -55,14 +55,16 @@ def logout():
 @app.route('/todo/<id>', methods=['GET'])
 @login_required
 def todo(id):
-    todo = ToDo.objects.where(id=int(id)).first()
+    user_id = session['user']['id']
+    todo = ToDo.objects.where(id=int(id), user_id=user_id).first()
     return render_template('todo.html', todo=todo)
 
 
 @app.route('/todo/<id>/json', methods=['GET'])
 @login_required
 def todo_json(id):
-    todo = ToDo.objects.where(id=int(id)).first()
+    user_id = session['user']['id']
+    todo = ToDo.objects.where(id=int(id), user_id=user_id).first()
     return jsonify(dict(todo))
 
 
@@ -70,14 +72,16 @@ def todo_json(id):
 @app.route('/todo/', methods=['GET'])
 @login_required
 def todos():
+    user_id = session['user']['id']
     page = int(request.args.get('page', 1))
     per_page = 3
-    total = ToDo.objects.count()
+    total = ToDo.objects.where(user_id=user_id).count()
     pagination = Pagination(page, per_page, total)
     if page > pagination.pages:
         return redirect('/todo/')
     offset = per_page*(page-1)
-    todos = ToDo.objects.offset(offset).limit(per_page).all()
+    todos = ToDo.objects.where(user_id=user_id)
+    todos = todos.offset(offset).limit(per_page).all()
     return render_template('todos.html', 
         todos=todos, pagination=pagination)
 
@@ -100,15 +104,21 @@ def todos_POST():
 @app.route('/todo/<id>', methods=['POST'])
 @login_required
 def todo_delete(id):
-    ToDo.objects.where(id=int(id)).first().delete()
-    flash('TODO successfully deleted')
+    user_id = session['user']['id']
+    todo = ToDo.objects.where(id=int(id), user_id=user_id).first()
+    if todo:
+        todo.delete()
+        flash('TODO successfully deleted')
+    else:
+        flash('Nothing was deleted')
     return redirect('/todo')
 
 
 @app.route('/todo/mark/<id>', methods=['POST'])
 @login_required
 def todo_mark(id):
-    todo = ToDo.objects.where(id=int(id)).first()
+    user_id = session['user']['id']
+    todo = ToDo.objects.where(id=int(id), user_id=user_id).first()
     if todo:
         todo.completed = not todo.completed
         todo.save()
