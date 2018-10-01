@@ -29,6 +29,8 @@ if __name__ == '__main__':
     if args['initdb']:
         _run_sql('resources/database.sql')
         _run_sql('resources/fixtures.sql')
+        from resources import fixtures
+        fixtures.main()
         print "AlayaTodo: Database initialized."
     elif args['migrate']:
         for migration in os.listdir('resources/migrations'):

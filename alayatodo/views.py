@@ -35,9 +35,8 @@ def login_POST():
     username = request.form.get('username')
     password = request.form.get('password')
 
-    user = User.objects.where(
-        username=username, password=password).first()
-    if user:
+    user = User.objects.where(username=username).first()
+    if user and user.check_password(password):
         session['user'] = dict(user)
         session['logged_in'] = True
         return redirect('/todo')
