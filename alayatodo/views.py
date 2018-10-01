@@ -2,6 +2,7 @@ from alayatodo import app
 import alayatodo.helpers as helpers
 from alayatodo.pagination import Pagination
 from alayatodo.models import User, ToDo
+from alayatodo.decorators import login_required
 from flask import (
     g,
     redirect,
@@ -52,12 +53,14 @@ def logout():
 
 
 @app.route('/todo/<id>', methods=['GET'])
+@login_required
 def todo(id):
     todo = ToDo.objects.where(id=int(id)).first()
     return render_template('todo.html', todo=todo)
 
 
 @app.route('/todo/<id>/json', methods=['GET'])
+@login_required
 def todo_json(id):
     todo = ToDo.objects.where(id=int(id)).first()
     return jsonify(dict(todo))
@@ -65,9 +68,8 @@ def todo_json(id):
 
 @app.route('/todo', methods=['GET'])
 @app.route('/todo/', methods=['GET'])
+@login_required
 def todos():
-    if not session.get('logged_in'):
-        return redirect('/login')
     page = int(request.args.get('page', 1))
     per_page = 3
     total = ToDo.objects.count()
@@ -82,9 +84,8 @@ def todos():
 
 @app.route('/todo', methods=['POST'])
 @app.route('/todo/', methods=['POST'])
+@login_required
 def todos_POST():
-    if not session.get('logged_in'):
-        return redirect('/login')
     if not request.form.get('description', ''):
         return redirect('/todo')
     todo = ToDo(
@@ -97,18 +98,16 @@ def todos_POST():
 
 
 @app.route('/todo/<id>', methods=['POST'])
+@login_required
 def todo_delete(id):
-    if not session.get('logged_in'):
-        return redirect('/login')
     ToDo.objects.where(id=int(id)).first().delete()
     flash('TODO successfully deleted')
     return redirect('/todo')
 
 
 @app.route('/todo/mark/<id>', methods=['POST'])
+@login_required
 def todo_mark(id):
-    if not session.get('logged_in'):
-        return redirect('/login')
     todo = ToDo.objects.where(id=int(id)).first()
     if todo:
         todo.completed = not todo.completed
